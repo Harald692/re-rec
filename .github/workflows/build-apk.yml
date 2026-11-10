@@ -22,7 +22,6 @@ jobs:
           ls node_modules/tesseract.js-core/
           cp node_modules/tesseract.js-core/tesseract-core-*lstm.wasm.js www/tess/core/ 2>/dev/null || cp node_modules/tesseract.js-core/tesseract-core*.wasm.js www/tess/core/
           curl -fsSL -o www/tess/lang/deu.traineddata https://github.com/tesseract-ocr/tessdata_fast/raw/main/deu.traineddata
-          gzip -9 www/tess/lang/deu.traineddata
           ls -la www/tess www/tess/core www/tess/lang
       - run: npx cap add android
       - run: npx cap sync android

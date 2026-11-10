@@ -383,7 +383,7 @@ async function ocr(canvas,prog){
   if(DEMO)return demoOcrText();
   await ladeTesseract();
   if(!worker){const opt={logger:m=>{if(m.status==='recognizing text')prog(m.progress);else prog(null,m.status)}};
-    if(await pruefeLokal()){const abs=p=>new URL(p,location.href).href;Object.assign(opt,{workerPath:abs('tess/worker.min.js'),corePath:abs('tess/core'),langPath:abs('tess/lang')})}
+    if(await pruefeLokal()){const abs=p=>new URL(p,location.href).href;Object.assign(opt,{workerPath:abs('tess/worker.min.js'),corePath:abs('tess/core'),langPath:abs('tess/lang'),gzip:false})}
     worker=await Tesseract.createWorker('deu',1,opt);await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'})}
   const {data}=await worker.recognize(fuerOcr(canvas));return data.text||'';
 }
