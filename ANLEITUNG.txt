@@ -1,0 +1,34 @@
+re rec – Android-App bauen (wie re.kalk, ohne Android Studio)
+=============================================================
+
+1. Auf github.com ein neues Repository anlegen: Name "re-rec", Sichtbarkeit "Public".
+   (Public, damit die App spaeter Updates ohne Anmeldung laden kann. Im Code stehen
+   keine Zugangsdaten - die Anwendungs-ID traegst du erst in der App ein.)
+2. Den kompletten Inhalt dieses Ordners hochladen, AUCH den Ordner ".github":
+   "Add file" > "Upload files" und alle Dateien/Ordner hineinziehen > "Commit changes".
+   Fehlt danach der Ordner .github: "Add file" > "Create new file", als Namen
+   .github/workflows/build-apk.yml eintippen und den Inhalt der gleichnamigen Datei einfuegen.
+3. Reiter "Actions": Der Lauf "APK bauen" startet automatisch (ca. 6-8 Minuten).
+4. Danach rechts unter "Releases" die neueste Version oeffnen und "reRec.apk" herunterladen
+   (oder ueber OneDrive aufs Handy). APK antippen, "Aus dieser Quelle installieren" erlauben.
+
+IN DER APP EINRICHTEN
+- Zahnrad oben rechts > Anwendungs-ID eintragen (dieselbe wie bei der Zeiterfassung).
+- "Mit Microsoft anmelden". Die Adresse https://appassets.androidplatform.net/ ist in Entra
+  von der Zeiterfassung her schon eingetragen - es muss nichts geaendert werden.
+  Meldet Microsoft "redirect_uri" bzw. "Antwort-URL stimmt nicht": in Entra unter
+  Authentifizierung > Single-Page-Anwendung genau diese Adresse ergaenzen.
+- Den Ordner von re admin sucht die App selbst (Datei daten.json im OneDrive).
+- Beim ersten Foto die Kamera erlauben.
+
+TEXTERKENNUNG
+Die Texterkennung (Deutsch) ist in der APK enthalten und funktioniert auch ohne Internet.
+Hochgeladen wird, sobald wieder Internet da ist.
+
+UPDATES
+Neue Version in dieses Repository hochladen > GitHub baut neu > die App zeigt
+"Update verfuegbar" (Zahnrad > "Jetzt aktualisieren"). Eine neue APK ist nur noetig,
+wenn sich am Android-Teil selbst etwas aendert; sie laesst sich ueber die alte installieren.
+
+iPhone: Die APK laeuft nur auf Android. Fuers iPhone gibt es re rec weiterhin als
+Web-App (Ordner App aus re-rec.zip auf Netlify).

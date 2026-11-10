@@ -1,0 +1,5 @@
+{"appId":"onl.resolution.rerec","appName":"re rec","webDir":"www",
+ "server":{"hostname":"appassets.androidplatform.net","androidScheme":"https",
+   "allowNavigation":["login.microsoftonline.com","*.login.microsoftonline.com","login.microsoft.com","login.live.com","account.live.com","*.msauth.net","*.msftauth.net","*.microsoftonline-p.com","*.okta.com"]},
+ "android":{"backgroundColor":"#173a6b"},
+ "plugins":{"CapacitorUpdater":{"autoUpdate":false,"resetWhenUpdate":false}}}
