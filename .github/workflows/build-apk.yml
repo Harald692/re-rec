@@ -40,16 +40,22 @@ jobs:
             done
           done
           rm -rf android/app/src/main/res/mipmap-anydpi-v26
+      - name: Fester Signaturschlüssel (damit sich neue APKs über die alte installieren lassen)
+        run: mkdir -p ~/.android && cp signing/debug.keystore ~/.android/debug.keystore
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug
       - name: Update-Paket erstellen
         run: |
           cd www && zip -qr ../www.zip . && cd ..
           cp android/app/build/outputs/apk/debug/app-debug.apk reRec.apk
+          # Der Update-Baustein verlangt die SHA-256-Prüfsumme des Pakets
+          echo "sha256:$(sha256sum www.zip | cut -d' ' -f1)" > release-body.txt
+          cat release-body.txt
       - name: Als Release veröffentlichen
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
           name: re rec Version ${{ github.run_number }}
+          body_path: release-body.txt
           files: |
             reRec.apk
             www.zip
