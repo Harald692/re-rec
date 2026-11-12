@@ -25,6 +25,43 @@ jobs:
           ls -la www/tess www/tess/core www/tess/lang
       - run: npx cap add android
       - run: npx cap sync android
+      - name: Rücksprung nach der Microsoft-Anmeldung in der App behalten
+        run: |
+          F=$(find android/app/src/main/java -name MainActivity.java)
+          PKG=$(sed -n 's/^package \(.*\);/\1/p' "$F")
+          cat > "$F" <<JAVA
+          package $PKG;
+
+          import android.os.Bundle;
+          import android.webkit.WebResourceRequest;
+          import android.webkit.WebView;
+          import com.getcapacitor.Bridge;
+          import com.getcapacitor.BridgeActivity;
+          import com.getcapacitor.BridgeWebViewClient;
+
+          public class MainActivity extends BridgeActivity {
+              @Override
+              public void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  final Bridge bridge = getBridge();
+                  bridge.setWebViewClient(new BridgeWebViewClient(bridge) {
+                      @Override
+                      public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+                          // Microsoft leitet nach der Anmeldung per Weiterleitung auf die App-Adresse zurück.
+                          // Weiterleitungen gibt Android nicht an die App weiter -> als neue Navigation laden.
+                          if (request.isForMainFrame() && request.isRedirect()
+                                  && "appassets.androidplatform.net".equals(request.getUrl().getHost())) {
+                              final String target = request.getUrl().toString();
+                              view.post(() -> view.loadUrl(target));
+                              return true;
+                          }
+                          return super.shouldOverrideUrlLoading(view, request);
+                      }
+                  });
+              }
+          }
+          JAVA
+          cat "$F"
       - name: Kamera-Berechtigung und Android-SDK 35
         run: |
           M=android/app/src/main/AndroidManifest.xml
