@@ -44,7 +44,7 @@ main{padding:14px max(14px,env(safe-area-inset-right,0px)) calc(env(safe-area-in
 #cam .frame::after{right:-4px;bottom:-4px;border-left:0;border-top:0;border-radius:0 0 12px 0}
 #cam .top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 10px;color:#fff;background:linear-gradient(rgba(0,0,0,.55),transparent)}
 #cam .top .t{flex:1;font-family:var(--disp);font-weight:700}
-#cam .hint{position:absolute;left:0;right:0;bottom:132px;text-align:center;color:#fff;font-size:14px;text-shadow:0 1px 4px #000}
+#cam .hint{position:absolute;left:0;right:0;bottom:132px;padding:0 24px;text-align:center;color:#fff;font-size:14px;text-shadow:0 1px 4px #000}
 #cam .ctl{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-around;padding:18px 20px calc(env(safe-area-inset-bottom,0px) + 22px);background:linear-gradient(transparent,rgba(0,0,0,.7))}
 .shutter{width:76px;height:76px;border-radius:50%;border:5px solid #fff;background:var(--orange);cursor:pointer;box-shadow:0 0 0 3px rgba(0,0,0,.25)}
 .shutter:active{transform:scale(.94)}
@@ -71,6 +71,14 @@ h2{font-family:var(--disp);font-size:19px;margin:0 0 12px}
 .thumb img{display:block;width:100%;max-height:300px;object-fit:contain}
 .thumb .tools{position:absolute;right:8px;bottom:8px;display:flex;gap:6px}
 .thumb .tools button{background:rgba(0,0,0,.6);color:#fff;border:0;border-radius:9px;padding:7px 10px;font-size:14px;cursor:pointer}
+.tools2{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 12px}.tools2 button{flex:1 1 auto;border:1.5px solid var(--line);background:var(--panel);border-radius:10px;padding:9px 8px;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink)}
+.thumb .badge{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.62);color:#fff;font-size:12.5px;padding:4px 9px;border-radius:99px}
+.zs-st{position:relative;margin:0 auto 12px;touch-action:none;user-select:none;background:#111;border-radius:10px;overflow:hidden}
+.zs-st canvas{display:block}.zs-st svg{position:absolute;inset:0;pointer-events:none}
+.zs-st .hd{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:3px solid var(--orange);background:rgba(239,125,0,.25);touch-action:none}
+.mon{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.mon b{font-size:18px}.mon .ib{background:var(--panel);border:1.5px solid var(--line);color:var(--ink);width:44px;height:44px;border-radius:12px;font-size:20px}
+.li .nr{width:22px;text-align:right;color:var(--muted);font-size:13px;flex:0 0 auto}
+.tot{display:flex;justify-content:space-between;font-weight:700;padding:4px 0}.tot span{font-weight:500;color:var(--muted)}
 .ocr{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;background:var(--orange-soft);color:var(--ink);font-size:14px;margin-bottom:12px}
 .ocr .pb{flex:1;height:6px;border-radius:3px;background:rgba(0,0,0,.1);overflow:hidden}.ocr .pb i{display:block;height:100%;background:var(--orange);width:0;transition:width .3s}
 .note{font-size:13.5px;color:var(--muted);line-height:1.45}
@@ -100,7 +108,7 @@ code{font-size:13px;background:var(--bg);padding:1px 5px;border-radius:5px;word-
 <body>
 <div id="app"></div>
 <input type="file" id="pick" accept="image/*" class="hidden">
-<script id="app-meta" type="application/json">{"version":"1.0","date":"2026-11-10"}</script>
+<script id="app-meta" type="application/json">{"version":"1.1","date":"2026-11-12"}</script>
 <script>
 /* ===================== Minimaler PDF-Generator (Helvetica, WinAnsi) ===================== */
 const WH=[278,278,355,556,556,889,667,191,333,333,389,584,278,333,278,278,556,556,556,556,556,556,556,556,556,556,278,278,584,584,584,556,1015,667,667,722,722,667,611,778,722,278,500,667,556,833,722,778,667,778,722,667,611,722,667,944,667,667,611,278,278,278,469,556,333,556,556,500,556,556,278,556,556,222,222,500,222,833,556,556,556,556,333,500,278,556,500,722,500,500,500,334,260,334,584,761,556,556,222,556,333,1000,556,556,333,1000,667,333,1000,556,611,556,556,222,222,333,333,350,556,1000,333,1000,500,333,944,556,500,667,278,333,556,556,556,556,260,556,333,737,370,556,584,333,737,333,400,584,333,333,333,556,537,278,333,333,365,556,834,834,834,611,667,667,667,667,667,667,1000,722,667,667,667,667,278,278,278,278,722,722,778,778,778,778,778,584,778,722,722,722,722,667,667,611,556,556,556,556,556,556,889,500,556,556,556,556,278,278,278,278,556,556,556,556,556,556,556,584,611,556,556,556,556,500,556,500];
@@ -137,6 +145,7 @@ class MiniPDF{
   line(x1,y1,x2,y2,w=.5,c){this.cur.push(`${this._rgb(c)} RG ${w} w ${x1.toFixed(2)} ${(this.H-y1).toFixed(2)} m ${x2.toFixed(2)} ${(this.H-y2).toFixed(2)} l S`)}
   rect(x,y,w,h,fill){this.cur.push(`${this._rgb(fill)} rg ${x.toFixed(2)} ${(this.H-y-h).toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)} re f`)}
   addImage(bin,w,h){this.imgs.push({bin,w,h});return 'Im'+this.imgs.length}
+  imageClip(x,y,w,h,name,cx,cy,cw,ch){this.cur.push(`q ${cx.toFixed(2)} ${(this.H-cy-ch).toFixed(2)} ${cw.toFixed(2)} ${ch.toFixed(2)} re W n ${w.toFixed(2)} 0 0 ${h.toFixed(2)} ${x.toFixed(2)} ${(this.H-y-h).toFixed(2)} cm /${name} Do Q`)}
   setImage(bin,w,h){this.logo=this.addImage(bin,w,h)}
   image(x,y,w,h,name){name=name||this.logo;if(name)this.cur.push(`q ${w.toFixed(2)} 0 0 ${h.toFixed(2)} ${x.toFixed(2)} ${(this.H-y-h).toFixed(2)} cm /${name} Do Q`)}
   output(extra){
@@ -369,8 +378,8 @@ function skaliere(src,max,rot=0){
   const c=document.createElement('canvas');c.width=r%180?hh:w;c.height=r%180?w:hh;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);
   x.translate(c.width/2,c.height/2);x.rotate(r*Math.PI/180);x.drawImage(src,-w/2,-hh/2,w,hh);return c;
 }
-function fuerOcr(src){ // Graustufen + Kontrast, ~1800 px
-  const c=skaliere(src,1800,0),x=c.getContext('2d'),d=x.getImageData(0,0,c.width,c.height),a=d.data;
+function fuerOcr(src){ // Graustufen + Kontrast; lange Belege nach Breite skalieren, damit die Schrift gross genug bleibt
+  const fk=Math.min(1,1600/src.width,Math.sqrt(7e6/(src.width*src.height)));const c=skaliere(src,Math.max(src.width,src.height)*fk,0),x=c.getContext('2d'),d=x.getImageData(0,0,c.width,c.height),a=d.data;
   let mn=255,mx=0;const g=new Uint8ClampedArray(a.length/4);
   for(let i=0,j=0;i<a.length;i+=4,j++){const v=.299*a[i]+.587*a[i+1]+.114*a[i+2];g[j]=v;if(v<mn)mn=v;if(v>mx)mx=v}
   const lo=mn+(mx-mn)*.12,hi=mx-(mx-mn)*.08,f=255/Math.max(1,hi-lo);
@@ -389,32 +398,175 @@ async function ocr(canvas,prog){
     worker=await Tesseract.createWorker('deu',1,opt);await worker.setParameters({tessedit_pageseg_mode:'6',preserve_interword_spaces:'1'})}
   const {data}=await worker.recognize(fuerOcr(canvas));return data.text||'';
 }
+/* ---------- Beleg-Umriss erkennen, gerade ziehen, Scan-Look ---------- */
+function huelle(P){
+  P.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);const lo=[],up=[];
+  for(const p of P){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}
+  for(let i=P.length-1;i>=0;i--){const p=P[i];while(up.length>=2&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}
+  lo.pop();up.pop();return lo.concat(up);
+}
+function flaeche(q){let a=0;for(let i=0;i<q.length;i++){const p=q[i],r=q[(i+1)%q.length];a+=p[0]*r[1]-r[0]*p[1]}return Math.abs(a)/2}
+// Sucht das helle Papier im Bild; liefert die 4 Ecken [oben links, oben rechts, unten rechts, unten links] oder null
+function umrissErkennen(src){
+  const sc=Math.min(1,Math.sqrt(260000/(src.width*src.height)));
+  const w=Math.max(8,Math.round(src.width*sc)),hh=Math.max(8,Math.round(src.height*sc)),N=w*hh;
+  const c=document.createElement('canvas');c.width=w;c.height=hh;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0,w,hh);
+  const a=x.getImageData(0,0,w,hh).data,L=new Uint8Array(N),S=new Uint8Array(N),hist=new Float64Array(256);
+  for(let i=0,j=0;j<N;i+=4,j++){const r=a[i],g=a[i+1],b=a[i+2];L[j]=(r*77+g*150+b*29)>>8;S[j]=Math.max(r,g,b)-Math.min(r,g,b);hist[L[j]]++}
+  let sum=0;for(let t=0;t<256;t++)sum+=t*hist[t];
+  let sB=0,wB=0,bestV=-1,thr=128; // Otsu-Schwelle hell/dunkel
+  for(let t=0;t<256;t++){wB+=hist[t];if(!wB)continue;const wF=N-wB;if(!wF)break;sB+=t*hist[t];const d=sB/wB-(sum-sB)/wF,v=wB*wF*d*d;if(v>bestV){bestV=v;thr=t}}
+  const m=new Uint8Array(N);for(let j=0;j<N;j++)m[j]=(L[j]>thr&&S[j]<80)?1:0;
+  const er=new Uint8Array(N); // leicht abtragen: trennt dünne Brücken zu hellen Flächen im Hintergrund
+  for(let yy=1;yy<hh-1;yy++)for(let xx=1;xx<w-1;xx++){const j=yy*w+xx;er[j]=m[j]&m[j-1]&m[j+1]&m[j-w]&m[j+w]}
+  const lab=new Int32Array(N),st=new Int32Array(N);let bestL=0,bestN=0,n=0;
+  for(let j=0;j<N;j++){if(!er[j]||lab[j])continue;n++;let sp=0,cnt=0;st[sp++]=j;lab[j]=n;
+    while(sp){const k=st[--sp];cnt++;const kx=k%w;
+      if(kx>0&&er[k-1]&&!lab[k-1]){lab[k-1]=n;st[sp++]=k-1}
+      if(kx<w-1&&er[k+1]&&!lab[k+1]){lab[k+1]=n;st[sp++]=k+1}
+      if(k>=w&&er[k-w]&&!lab[k-w]){lab[k-w]=n;st[sp++]=k-w}
+      if(k<N-w&&er[k+w]&&!lab[k+w]){lab[k+w]=n;st[sp++]=k+w}}
+    if(cnt>bestN){bestN=cnt;bestL=n}}
+  if(!bestL||bestN<N*0.03)return null;
+  const P=[];let x0=w,x1=0,y0=hh,y1=0;
+  for(let yy=0;yy<hh;yy++){let f=-1,l=-1;const o=yy*w;for(let xx=0;xx<w;xx++)if(lab[o+xx]===bestL){if(f<0)f=xx;l=xx}
+    if(f>=0){P.push([f-1,yy],[l+2,yy]);if(f<x0)x0=f;if(l>x1)x1=l;if(yy<y0)y0=yy;if(yy>y1)y1=yy}}
+  P.push([P[0][0],y0-1],[P[1][0],y0-1],[P[P.length-2][0],y1+2],[P[P.length-1][0],y1+2]);
+  if((x1-x0)>w*0.97&&(y1-y0)>hh*0.97)return null; // Papier füllt das ganze Bild: nichts zuzuschneiden
+  const H=huelle(P);if(H.length<3)return null;
+  let best=null; // kleinstes umschliessendes Rechteck (beliebig gedreht)
+  for(let i=0;i<H.length;i++){const p=H[i],q=H[(i+1)%H.length];const an=Math.atan2(q[1]-p[1],q[0]-p[0]),co=Math.cos(an),si=Math.sin(an);
+    let a0=1e9,a1=-1e9,b0=1e9,b1=-1e9;for(const r of H){const u=r[0]*co+r[1]*si,v=-r[0]*si+r[1]*co;if(u<a0)a0=u;if(u>a1)a1=u;if(v<b0)b0=v;if(v>b1)b1=v}
+    const ar=(a1-a0)*(b1-b0);if(!best||ar<best.ar)best={ar,co,si,a0,a1,b0,b1}}
+  const R=[[best.a0,best.b0],[best.a1,best.b0],[best.a1,best.b1],[best.a0,best.b1]].map(([u,v])=>[u*best.co-v*best.si,u*best.si+v*best.co]);
+  // Ecken der Hülle, die den Rechteckecken am nächsten liegen (folgt der Perspektive)
+  let Q=R.map(r=>{let bp=H[0],bd=1e18;for(const p of H){const d=(p[0]-r[0])**2+(p[1]-r[1])**2;if(d<bd){bd=d;bp=p}}return bp});
+  if(new Set(Q.map(String)).size<4||flaeche(Q)<flaeche(H)*0.85)Q=R;
+  const cx=Q.reduce((s,p)=>s+p[0],0)/4,cy=Q.reduce((s,p)=>s+p[1],0)/4;
+  Q.sort((p,q)=>Math.atan2(p[1]-cy,p[0]-cx)-Math.atan2(q[1]-cy,q[0]-cx));
+  let k=0;Q.forEach((p,i)=>{if(p[0]+p[1]<Q[k][0]+Q[k][1])k=i});Q=Q.slice(k).concat(Q.slice(0,k));
+  const diag=Math.hypot(src.width,src.height)*0.0015;
+  return Q.map(([px,py])=>{let X=px/sc,Y=py/sc;const dx=X-cx/sc,dy=Y-cy/sc,dl=Math.hypot(dx,dy)||1;X+=dx/dl*diag;Y+=dy/dl*diag;
+    return {x:Math.max(0,Math.min(src.width,X)),y:Math.max(0,Math.min(src.height,Y))}});
+}
+// Schneidet das Viereck q aus und zieht es gerade (Perspektive), volle Auflösung
+function entzerren(src,q,maxPx=9e6){
+  const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  let W=Math.max(d(q[0],q[1]),d(q[3],q[2])),H=Math.max(d(q[0],q[3]),d(q[1],q[2]));
+  const k=Math.min(1,Math.sqrt(maxPx/(W*H)));W=Math.max(1,Math.round(W*k));H=Math.max(1,Math.round(H*k));
+  const sw=src.width,sh=src.height,sd=src.getContext('2d',{willReadFrequently:true}).getImageData(0,0,sw,sh).data;
+  const [p0,p1,p2,p3]=q,dx1=p1.x-p2.x,dx2=p3.x-p2.x,dx3=p0.x-p1.x+p2.x-p3.x,dy1=p1.y-p2.y,dy2=p3.y-p2.y,dy3=p0.y-p1.y+p2.y-p3.y;
+  let g=0,hh=0;const den=dx1*dy2-dx2*dy1;if((Math.abs(dx3)>1e-6||Math.abs(dy3)>1e-6)&&Math.abs(den)>1e-9){g=(dx3*dy2-dx2*dy3)/den;hh=(dx1*dy3-dx3*dy1)/den}
+  const A=p1.x-p0.x+g*p1.x,B=p3.x-p0.x+hh*p3.x,C=p0.x,D=p1.y-p0.y+g*p1.y,E=p3.y-p0.y+hh*p3.y,F=p0.y;
+  const c=document.createElement('canvas');c.width=W;c.height=H;const cx=c.getContext('2d'),od=cx.createImageData(W,H),o=od.data;
+  for(let y=0;y<H;y++){const v=(y+.5)/H;
+    for(let x=0;x<W;x++){const u=(x+.5)/W,z=g*u+hh*v+1;let sx=(A*u+B*v+C)/z-.5,sy=(D*u+E*v+F)/z-.5;
+      if(sx<0)sx=0;else if(sx>sw-1.001)sx=sw-1.001;if(sy<0)sy=0;else if(sy>sh-1.001)sy=sh-1.001;
+      const ix=sx|0,iy=sy|0,fx=sx-ix,fy=sy-iy,i0=(iy*sw+ix)*4,i1=i0+sw*4,oi=(y*W+x)*4;
+      for(let ch=0;ch<3;ch++){const t=sd[i0+ch]+(sd[i0+4+ch]-sd[i0+ch])*fx,b=sd[i1+ch]+(sd[i1+4+ch]-sd[i1+ch])*fx;o[oi+ch]=t+(b-t)*fy}
+      o[oi+3]=255}}
+  cx.putImageData(od,0,0);return c;
+}
+// Scan-Look: gleicht Schatten aus, Papier weiss, Schrift schwarz (Graustufen)
+function scanLook(src){
+  const w=src.width,h=src.height,cs=Math.max(12,Math.round(Math.min(w,h)/14)),gw=Math.ceil(w/cs),gh=Math.ceil(h/cs);
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0);
+  const d=x.getImageData(0,0,w,h),a=d.data,l=new Uint8Array(w*h);
+  for(let i=0,j=0;j<l.length;i+=4,j++)l[j]=(a[i]*77+a[i+1]*150+a[i+2]*29)>>8;
+  const bg=new Float32Array(gw*gh),buf=[];
+  for(let gy=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++){buf.length=0;const ye=Math.min(h,(gy+1)*cs),xe=Math.min(w,(gx+1)*cs);
+    for(let yy=gy*cs;yy<ye;yy+=2)for(let xx=gx*cs;xx<xe;xx+=2)buf.push(l[yy*w+xx]);
+    buf.sort((p,q)=>p-q);bg[gy*gw+gx]=Math.max(40,buf[Math.floor(buf.length*0.9)]||255)}
+  const bs=new Float32Array(gw*gh); // glätten
+  for(let gy=0;gy<gh;gy++)for(let gx=0;gx<gw;gx++){let s=0,n=0;for(let yy=Math.max(0,gy-1);yy<=Math.min(gh-1,gy+1);yy++)for(let xx=Math.max(0,gx-1);xx<=Math.min(gw-1,gx+1);xx++){s+=bg[yy*gw+xx];n++}bs[gy*gw+gx]=s/n}
+  for(let y=0;y<h;y++){const gyf=Math.max(0,Math.min(gh-1.001,(y+.5)/cs-.5)),gy=gyf|0,fy=gyf-gy,gy2=Math.min(gh-1,gy+1);
+    for(let xx=0;xx<w;xx++){const gxf=Math.max(0,Math.min(gw-1.001,(xx+.5)/cs-.5)),gx=gxf|0,fx=gxf-gx,gx2=Math.min(gw-1,gx+1);
+      const t=bs[gy*gw+gx]+(bs[gy*gw+gx2]-bs[gy*gw+gx])*fx,b=bs[gy2*gw+gx]+(bs[gy2*gw+gx2]-bs[gy2*gw+gx])*fx,B=t+(b-t)*fy;
+      const n=l[y*w+xx]/B;let v=(n-0.38)/(0.9-0.38);v=v<0?0:v>1?1:v;const o=(y*w+xx)*4;a[o]=a[o+1]=a[o+2]=Math.round(255*Math.pow(v,1.15))}}
+  x.putImageData(d,0,0);return c;
+}
+function drehen(src,rot){const r=((rot%360)+360)%360;if(!r)return src;const c=document.createElement('canvas');c.width=r%180?src.height:src.width;c.height=r%180?src.width:src.height;
+  const x=c.getContext('2d');x.translate(c.width/2,c.height/2);x.rotate(r*Math.PI/180);x.drawImage(src,-src.width/2,-src.height/2);return c}
+// Mehrere Teile eines langen Belegs untereinander zusammensetzen
+function zusammensetzen(bilder){
+  if(bilder.length===1)return bilder[0];
+  const W=Math.max(300,Math.min(1600,bilder[0].width));const hs=bilder.map(b=>Math.round(b.height*W/b.width));
+  const c=document.createElement('canvas');c.width=W;c.height=hs.reduce((s,v)=>s+v,0);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);
+  let y=0;bilder.forEach((b,i)=>{x.drawImage(b,0,y,W,hs[i]);y+=hs[i]});return c;
+}
+// aktuelles Belegbild aus allen Teilen (Zuschnitt, Drehung, Scan-Look) neu aufbauen
+function aktBild(){
+  for(const t of akt.teile)if(!t.bild)t.bild=t.ecken?entzerren(t.orig,t.ecken):t.orig;
+  akt.canvas=zusammensetzen(akt.teile.map(t=>{const r=drehen(t.bild,akt.rot);return akt.scan?scanLook(r):r}));
+  akt.vorschau=skaliere(akt.canvas,1400,0).toDataURL('image/jpeg',.8);
+}
+
+let anfuegen=false; // true: Kamera nimmt den nächsten Teil eines langen Belegs auf
 async function bildUebernehmen(canvas){
-  akt={canvas,rot:0,daten:{id:uid(),datum:today(),text:'',kategorie:'',betrag:'',waehrung:'CHF',mwst:''},sicher:{},ocrLaeuft:true,ocrText:''};
+  if(anfuegen&&akt){anfuegen=false;const ecken=umrissErkennen(canvas);akt.teile.push({orig:canvas,ecken,auto:!!ecken,bild:null});
+    ansicht='form';aktBild();render();toast(`Teil ${akt.teile.length} angefügt`);return ocrLauf()}
+  anfuegen=false;
+  akt={teile:[],rot:0,scan:true,daten:{id:uid(),datum:today(),text:'',kategorie:'',betrag:'',waehrung:'CHF',mwst:''},sicher:{},beruehrt:{},ocrLaeuft:true,ocrText:''};
   ansicht='form';render();
+  await new Promise(r=>setTimeout(r,30));
+  const ecken=umrissErkennen(canvas);akt.teile.push({orig:canvas,ecken,auto:!!ecken,bild:null});aktBild();
+  if(ansicht==='form')render();
+  await ocrLauf();
+}
+async function ocrLauf(){
+  if(!akt)return;const id=akt.ocrId=(akt.ocrId||0)+1,a=akt;a.ocrLaeuft=true;a.ocrFehler='';if(ansicht==='form')render();
   const setP=(p,st)=>{const b=$('#ocrbar');const t=$('#ocrt');if(b&&p!=null)b.style.width=Math.round(p*100)+'%';if(t&&st)t.textContent=({'loading tesseract core':'Texterkennung wird geladen …','initializing tesseract':'Texterkennung startet …','loading language traineddata':'Sprachdaten werden geladen …','initializing api':'Texterkennung startet …'})[st]||'Beleg wird gelesen …'};
   try{
-    const txt=await ocr(canvas,setP);akt.ocrText=txt;
+    const txt=await ocr(a.canvas,setP);if(akt!==a||a.ocrId!==id)return;a.ocrText=txt;
     const p=parseBeleg(txt,new Date());
     const lern=LS.get('lern',{});const hk=(p.haendler||'').toLowerCase();
-    Object.assign(akt.daten,{datum:p.datum||today(),text:p.haendler||'',kategorie:(hk&&lern[hk])||p.kategorie||'',betrag:p.betrag!=null?p.betrag.toFixed(2):'',waehrung:p.waehrung,mwst:p.mwst!=null?p.mwst.toFixed(2):''});
-    akt.sicher={datum:!!p.datum&&p.sicher.datum,betrag:p.betrag!=null&&p.sicher.betrag,mwst:p.mwst!=null&&p.sicher.mwst,text:!!p.haendler,kategorie:!!akt.daten.kategorie};
-    akt.erkannt=true;
-  }catch(e){akt.ocrFehler=e.message}
-  akt.ocrLaeuft=false;if(ansicht==='form')render();
+    const setz=(k,v,ok)=>{if(a.beruehrt[k])return;a.daten[k]=v;a.sicher[k]=ok};
+    setz('datum',p.datum||a.daten.datum||today(),!!p.datum&&p.sicher.datum);
+    setz('text',p.haendler||a.daten.text||'',!!p.haendler);
+    const kat=(hk&&lern[hk])||p.kategorie||a.daten.kategorie||'';setz('kategorie',kat,!!kat);
+    setz('betrag',p.betrag!=null?p.betrag.toFixed(2):a.daten.betrag,p.betrag!=null&&p.sicher.betrag);
+    if(!a.beruehrt.betrag)a.daten.waehrung=p.waehrung;
+    setz('mwst',p.mwst!=null?p.mwst.toFixed(2):a.daten.mwst,p.mwst!=null&&p.sicher.mwst);
+    a.erkannt=true;
+  }catch(e){if(akt===a&&a.ocrId===id)a.ocrFehler=e.message}
+  if(akt!==a||a.ocrId!==id)return;
+  a.ocrLaeuft=false;if(ansicht==='form')render();
 }
 
 /* ---------- PDF ---------- */
+/* ---------- Lange Belege lesbar ins PDF: in Spalten nebeneinander und bei Bedarf auf Folgeseiten verteilen, statt zu verkleinern ---------- */
+function belegLayout(w,h,AW,AH){
+  const gap=16,ov=14,minCw=150,capCw=300,minFit=Math.min(AW,230),fit=Math.min(AW/w,AH/h);
+  if(w*fit>=minFit-0.5)return {fit:true,cw:w*fit,H:h*fit,n:1,slices:1,pages:1,gap,ov};
+  let best=null;
+  for(let cw=Math.min(capCw,AW);cw>=minCw;cw-=2){
+    const n=Math.max(1,Math.floor((AW+gap)/(cw+gap))),H=h*cw/w,s=H<=AH?1:Math.ceil((H-ov)/(AH-ov)),p=Math.ceil(s/n);
+    if(!best||p<best.pages)best={fit:false,cw,H,n:Math.min(n,s),slices:s,pages:p,gap,ov};
+  }
+  return best;
+}
+function belegZeichnen(pdf,name,w,h,box,neueSeite){ // box {L,R,top,bottom}; neueSeite(seitenIndex, seitenAnzahl) legt eine Seite mit Kopf an
+  const AW=box.R-box.L,AH=box.bottom-box.top,P=belegLayout(w,h,AW,AH);
+  if(P.fit){neueSeite(0,1);pdf.image(box.L+(AW-P.cw)/2,box.top,P.cw,P.H,name);return 1}
+  const breite=P.n*P.cw+(P.n-1)*P.gap,x0=box.L+(AW-breite)/2;
+  for(let i=0;i<P.slices;i++){
+    const col=i%P.n;if(col===0)neueSeite(Math.floor(i/P.n),P.pages);
+    const off=i*(AH-P.ov),sh=Math.min(AH,P.H-off),x=x0+col*(P.cw+P.gap);
+    pdf.imageClip(x,box.top-off,P.cw,P.H,name,x,box.top,P.cw,sh);
+    pdf.text(x+P.cw/2,box.top-4,`Abschnitt ${i+1} von ${P.slices}`,{size:7,color:[.55,.55,.55],align:'center'});
+  }
+  return P.pages;
+}
 function belegPdf(d,jpgBin,w,hh){
-  const pdf=new MiniPDF();pdf.addPage();const L=40,R=555,top=40;
-  pdf.text(L,top+12,'Kassabeleg',{size:14,bold:true});
-  pdf.text(R,top+12,(d.waehrung||'CHF')+' '+fmt(d.betrag),{size:14,bold:true,align:'right'});
-  pdf.text(L,top+30,[fmtD(d.datum),d.text,d.kategorie].filter(Boolean).join('  ·  '),{size:9.5,color:[.35,.35,.35]});
-  pdf.text(R,top+30,d.mwst!==''&&d.mwst!=null?'davon MWST '+fmt(d.mwst):'',{size:9.5,color:[.35,.35,.35],align:'right'});
-  pdf.line(L,top+40,R,top+40,.5,[.75,.75,.75]);
-  const name=pdf.addImage(jpgBin,w,hh);const aw=R-L,ah=842-top-60-30,sc=Math.min(aw/w,ah/hh);
-  pdf.image(L+(aw-w*sc)/2,top+52,w*sc,hh*sc,name);
-  pdf.text(L,822,'Erfasst mit re rec am '+new Date().toLocaleString('de-CH'),{size:7.5,color:[.5,.5,.5]});
+  const pdf=new MiniPDF(),L=40,R=555,top=40,name=pdf.addImage(jpgBin,w,hh),grau=[.35,.35,.35];
+  const seite=(pg,pages)=>{pdf.addPage();
+    pdf.text(L,top+12,'Kassabeleg'+(pages>1?`  (Seite ${pg+1} von ${pages})`:''),{size:14,bold:true});
+    pdf.text(R,top+12,(d.waehrung||'CHF')+' '+fmt(d.betrag),{size:14,bold:true,align:'right'});
+    pdf.text(L,top+30,[fmtD(d.datum),d.text,d.kategorie].filter(Boolean).join('  ·  '),{size:9.5,color:grau});
+    pdf.text(R,top+30,d.mwst!==''&&d.mwst!=null?'davon MWST '+fmt(d.mwst):'',{size:9.5,color:grau,align:'right'});
+    pdf.line(L,top+40,R,top+40,.5,[.75,.75,.75]);
+    pdf.text(L,822,'Erfasst mit re rec am '+new Date().toLocaleString('de-CH'),{size:7.5,color:[.5,.5,.5]})};
+  belegZeichnen(pdf,name,w,hh,{L,R,top:top+56,bottom:842-30},seite);
   const meta=btoa(unescape(encodeURIComponent(JSON.stringify({v:1,...d,erfasst:new Date().toISOString(),app:'re rec '+VERSION}))));
   return pdf.output('%RE-REC-DATA '+meta);
 }
@@ -423,13 +575,14 @@ async function canvasJpeg(c){const b=await new Promise(r=>c.toBlob(r,'image/jpeg
 /* ---------- Speichern, Warteschlange, Hochladen ---------- */
 async function speichern(){
   const d={...akt.daten,betrag:+(+String(akt.daten.betrag).replace(',','.')).toFixed(2),mwst:akt.daten.mwst===''?'':+(+String(akt.daten.mwst).replace(',','.')).toFixed(2)};
-  const c=skaliere(akt.canvas,1700,akt.rot);const bin=await canvasJpeg(c);
+  const k=Math.min(1,1400/akt.canvas.width,Math.sqrt(8e6/(akt.canvas.width*akt.canvas.height)));
+  const c=skaliere(akt.canvas,Math.max(akt.canvas.width,akt.canvas.height)*k,0);const bin=await canvasJpeg(c);
   const bytes=belegPdf(d,bin,c.width,c.height);
   const name=`${d.datum}_${slug(d.text)}_${d.betrag.toFixed(2)}_${d.id.slice(-4)}.pdf`;
   const th=skaliere(c,160,0).toDataURL('image/jpeg',.6);
   await DB.put({id:d.id,name,blob:new Blob([bytes],{type:'application/pdf'}),meta:d,thumb:th,status:'wartet',zeit:Date.now()});
   if(d.text){const lern=LS.get('lern',{});if(d.kategorie)lern[d.text.toLowerCase()]=d.kategorie;LS.set('lern',lern)}
-  akt=null;ansicht='kamera';render();queueLauf(true);
+  listMonat=d.datum.slice(0,7);akt=null;ansicht='kamera';render();queueLauf(true);
 }
 let laeuft=false;
 async function queueLauf(nachSpeichern){
@@ -449,14 +602,19 @@ async function queueLauf(nachSpeichern){
       await DB.put(x);
     }
     if(nachSpeichern||n)toast(n?`✓ ${n===1?'Beleg':n+' Belege'} in OneDrive abgelegt`:'Hochladen fehlgeschlagen – wird erneut versucht.',3500);
-  }finally{laeuft=false;aufraeumen();if(ansicht!=='form')render()}
+  }finally{laeuft=false;aufraeumen();if(ansicht==='kamera'&&!anfuegen||ansicht==='liste')render()}
 }
-async function aufraeumen(){const all=await DB.all();const ok=all.filter(x=>x.status==='ok').sort((a,b)=>b.zeit-a.zeit);for(const x of ok.slice(40))await DB.del(x.id)}
+async function aufraeumen(){ // Einträge bleiben für die Monatsliste; die PDF-Kopie im Handy wird nach 60 Tagen entfernt (liegt ja in OneDrive)
+  const all=await DB.all(),jetzt=Date.now();
+  for(const x of all){if(x.status!=='ok')continue;
+    if(jetzt-x.zeit>800*864e5){await DB.del(x.id);continue}
+    if(x.blob&&jetzt-x.zeit>60*864e5){x.blob=null;await DB.put(x)}}
+}
 window.addEventListener('online',()=>queueLauf());
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')queueLauf()});
 
 /* ---------- Ansichten ---------- */
-let ansicht='kamera';
+let ansicht='kamera',listMonat='';
 async function render(){
   if(ansicht!=='kamera')kameraStop();
   const app=$('#app');
@@ -466,10 +624,10 @@ async function render(){
     app.innerHTML=`<div id="cam">
       <video id="vid" playsinline muted autoplay></video><div class="frame"></div>
       <div class="top"><img src="${ICON}" alt="" style="width:30px;height:30px;border-radius:7px"><span class="t">re rec</span>
-        <button class="ib" id="g-list" aria-label="Belege">☰${offen?`<span class="dot">${offen}</span>`:''}</button><button class="ib" id="g-set" aria-label="Einstellungen">⚙</button></div>
-      ${appUpd&&bereit?`<div style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 66px);left:14px;right:14px;background:var(--orange);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px" id="g-upd">Update verfügbar: Version ${appUpd.version} – hier tippen</div>`:''}
-      ${!bereit?`<div style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 66px);left:14px;right:14px;background:var(--orange);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px" id="g-setup">Noch nicht mit OneDrive verbunden – hier tippen zum Einrichten.</div>`:''}
-      <div class="hint">Beleg flach hinlegen und in den Rahmen bringen</div>
+        ${anfuegen?`<button class="ib" id="g-abbr" aria-label="Abbrechen" style="width:auto;padding:0 14px;font-size:15px">Abbrechen</button>`:`<button class="ib" id="g-list" aria-label="Monatsliste">☰${offen?`<span class="dot">${offen}</span>`:''}</button><button class="ib" id="g-set" aria-label="Einstellungen">⚙</button>`}</div>
+      ${anfuegen?'':appUpd&&bereit?`<div style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 66px);left:14px;right:14px;background:var(--orange);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px" id="g-upd">Update verfügbar: Version ${appUpd.version} – hier tippen</div>`:''}
+      ${anfuegen||bereit?'':`<div style="position:absolute;top:calc(env(safe-area-inset-top,0px) + 66px);left:14px;right:14px;background:var(--orange);color:#fff;border-radius:12px;padding:10px 12px;font-size:14px" id="g-setup">Noch nicht mit OneDrive verbunden – hier tippen zum Einrichten.</div>`}
+      <div class="hint">${anfuegen?`Teil ${akt.teile.length+1}: nächsten Abschnitt des Belegs aufnehmen – oben etwas überlappen`:'Beleg flach auf einen dunklen Untergrund legen – der Umriss wird automatisch erkannt'}</div>
       <div class="err hidden" id="camerr"><div style="font-size:42px">📷</div><div id="camerrt"></div>
         <button class="btn or big" id="g-cap" style="max-width:320px">Foto mit der Kamera-App</button>${DEMO?'<button class="btn big" id="g-demo" style="max-width:320px">Beispielbeleg verwenden</button>':''}</div>
       <div class="ctl"><button class="side" id="g-file" aria-label="Aus Galerie">🖼</button><button class="shutter" id="shot" aria-label="Aufnehmen"></button><button class="side hidden" id="torch" aria-label="Licht">💡</button><span class="side" style="visibility:hidden" id="g-sp"></span></div>
@@ -479,7 +637,8 @@ async function render(){
     $('#g-file').onclick=()=>{$('#pick').removeAttribute('capture');$('#pick').click()};
     $('#g-cap')&&($('#g-cap').onclick=()=>{$('#pick').setAttribute('capture','environment');$('#pick').click()});
     $('#g-demo')&&($('#g-demo').onclick=async()=>bildUebernehmen(await demoBeleg()));
-    $('#g-list').onclick=()=>{ansicht='liste';render()};$('#g-set').onclick=()=>{ansicht='einst';render()};
+    if(anfuegen)$('#g-abbr').onclick=()=>{anfuegen=false;ansicht='form';render()};
+    else{$('#g-list').onclick=()=>{ansicht='liste';render()};$('#g-set').onclick=()=>{ansicht='einst';render()}}
     $('#g-setup')&&($('#g-setup').onclick=()=>{ansicht='einst';render()});
     $('#g-upd')&&($('#g-upd').onclick=()=>{ansicht='einst';render()});
     kameraStart();return;
@@ -491,9 +650,11 @@ async function render(){
     const un=k=>!akt.ocrLaeuft&&akt.erkannt&&!s[k]?'unsure':'';
     const kats=[...new Set([...LS.get('kats',[]),...STD_KATS])];
     app.innerHTML=kopf('Beleg erfassen')+`<main>
-      <div class="thumb"><img id="f-img" alt="Beleg"><div class="tools"><button id="f-rot">⟳ Drehen</button><button id="f-neu">Neu aufnehmen</button></div></div>
+      <div class="thumb"><img id="f-img" alt="Beleg">${akt.teile.length?`<span class="badge">${akt.teile.length>1?akt.teile.length+' Teile zusammengesetzt':akt.teile[0].ecken?(akt.teile[0].auto?'✓ Umriss erkannt':'✓ Zugeschnitten'):'Ganzes Foto – Zuschnitt prüfen'}</span>`:'<span class="badge">Bild wird aufbereitet …</span>'}</div>
+      <div class="tools2"><button id="f-zs">✂ Zuschnitt</button><button id="f-rot">⟳ Drehen</button><button id="f-scan">${akt.scan?'◐ Farbfoto':'◐ Scan'}</button><button id="f-teil">＋ Teil anfügen</button><button id="f-neu">Neu</button></div>
       ${akt.ocrLaeuft?`<div class="ocr"><span id="ocrt">Beleg wird gelesen …</span><span class="pb"><i id="ocrbar"></i></span></div>`:''}
       ${akt.ocrFehler?`<div class="note warn" style="margin-bottom:12px">${h(akt.ocrFehler)} Bitte die Felder von Hand ausfüllen.</div>`:''}
+      ${akt.teile.length===1&&akt.canvas&&akt.canvas.height>akt.canvas.width*2.2?`<div class="note" style="margin-bottom:12px">Langer Beleg? Ist unten etwas abgeschnitten, mit <b>＋ Teil anfügen</b> den Rest aufnehmen – die Teile werden automatisch untereinander gesetzt.</div>`:''}
       ${akt.erkannt?`<div class="note" style="margin-bottom:12px">Ausgelesene Werte sind vorausgefüllt. <b style="color:var(--warn)">Orange</b> markierte Felder bitte genau prüfen.</div>`:''}
       <div class="card">
         <div class="row"><label class="f ${un('datum')}"><span class="lh">Datum ${tag('datum')}</span><input type="date" id="f-datum" value="${h(d.datum)}"></label></div>
@@ -506,11 +667,16 @@ async function render(){
       <button class="btn or big" id="f-ok" ${akt.ocrLaeuft?'disabled':''}>Weiter</button>
       <button class="btn big" id="f-x" style="margin-top:10px">Verwerfen</button>
     </main>`;
-    const img=$('#f-img');img.src=skaliere(akt.canvas,1000,akt.rot).toDataURL('image/jpeg',.8);
+    const img=$('#f-img');if(akt.vorschau)img.src=akt.vorschau;
     const sync=()=>Object.assign(akt.daten,{datum:$('#f-datum').value,text:$('#f-text').value.trim(),kategorie:$('#f-kat').value.trim(),betrag:$('#f-betrag').value.trim(),waehrung:$('#f-cur').value,mwst:$('#f-mwst').value.trim()});
-    app.querySelectorAll('input,select').forEach(i=>i.addEventListener('input',()=>{sync();i.closest('.f')?.classList.remove('unsure')}));
-    $('#f-rot').onclick=()=>{sync();akt.rot=(akt.rot+90)%360;img.src=skaliere(akt.canvas,1000,akt.rot).toDataURL('image/jpeg',.8)};
-    const weg=()=>{akt=null;ansicht='kamera';render()};
+    const FK={'f-datum':'datum','f-text':'text','f-kat':'kategorie','f-betrag':'betrag','f-cur':'betrag','f-mwst':'mwst'};
+    app.querySelectorAll('input,select').forEach(i=>i.addEventListener('input',()=>{sync();if(FK[i.id])akt.beruehrt[FK[i.id]]=true;i.closest('.f')?.classList.remove('unsure')}));
+    const bereit=()=>{if(!akt.teile.length){toast('Einen Moment – das Bild wird noch aufbereitet');return false}sync();return true};
+    $('#f-rot').onclick=()=>{if(!bereit())return;akt.rot=(akt.rot+90)%360;aktBild();render();ocrLauf()};
+    $('#f-scan').onclick=()=>{if(!bereit())return;akt.scan=!akt.scan;aktBild();render()};
+    $('#f-zs').onclick=()=>{if(!bereit())return;akt.ti=akt.teile.length-1;ansicht='zuschnitt';render()};
+    $('#f-teil').onclick=()=>{if(!bereit())return;anfuegen=true;ansicht='kamera';render()};
+    const weg=()=>{akt=null;anfuegen=false;ansicht='kamera';render()};
     $('#f-neu').onclick=weg;$('#g-back').onclick=weg;
     $('#f-x').onclick=()=>frage('Diesen Beleg verwerfen?','Verwerfen',weg);
     $('#f-ok').onclick=()=>{sync();const b=+String(akt.daten.betrag).replace(',','.');
@@ -522,12 +688,52 @@ async function render(){
       bestaetigen()};
     return;
   }
+  if(ansicht==='zuschnitt'){
+    const ti=akt.ti||0,t=akt.teile[ti],o=t.orig;
+    let q=(t.ecken||[{x:0,y:0},{x:o.width,y:0},{x:o.width,y:o.height},{x:0,y:o.height}]).map(p=>({...p}));
+    app.innerHTML=kopf('Zuschnitt',akt.teile.length>1?`Teil ${ti+1} von ${akt.teile.length}`:'')+`<main>
+      <div class="note" style="margin-bottom:10px">Die vier orangen Punkte auf die Ecken des Belegs ziehen. Der Beleg wird danach gerade gezogen.</div>
+      <div class="zs-st" id="zs-st"><canvas id="zs-c"></canvas><svg id="zs-svg"><polygon id="zs-p" fill="rgba(239,125,0,.12)" stroke="#ef7d00" stroke-width="2.5"/></svg>${[0,1,2,3].map(i=>`<div class="hd" data-i="${i}"></div>`).join('')}</div>
+      ${akt.teile.length>1?`<div class="row" style="margin-bottom:10px"><button class="btn" id="zs-vor" ${ti?'':'disabled'}>‹ Teil ${ti}</button><button class="btn" id="zs-nach" ${ti<akt.teile.length-1?'':'disabled'}>Teil ${ti+2} ›</button></div>`:''}
+      <div class="row" style="margin-bottom:10px"><button class="btn" id="zs-auto">Automatisch</button><button class="btn" id="zs-voll">Ganzes Foto</button></div>
+      ${akt.teile.length>1?`<button class="btn" id="zs-del" style="width:100%;margin-bottom:10px">Diesen Teil entfernen</button>`:''}
+      <button class="btn or big" id="zs-ok">Übernehmen</button></main>`;
+    const st=$('#zs-st'),cv=$('#zs-c'),maxW=Math.min(app.clientWidth-28,532),maxH=window.innerHeight*0.58,ds=Math.min(maxW/o.width,maxH/o.height);
+    cv.width=Math.round(o.width*ds);cv.height=Math.round(o.height*ds);cv.getContext('2d').drawImage(o,0,0,cv.width,cv.height);st.style.width=cv.width+'px';st.style.height=cv.height+'px';
+    const hds=[...st.querySelectorAll('.hd')];
+    const zeichne=()=>{hds.forEach((e,i)=>{e.style.left=q[i].x*ds+'px';e.style.top=q[i].y*ds+'px'});$('#zs-p').setAttribute('points',q.map(p=>`${p.x*ds},${p.y*ds}`).join(' '))};zeichne();
+    hds.forEach((e,i)=>{e.addEventListener('pointerdown',ev=>{ev.preventDefault();e.setPointerCapture(ev.pointerId);
+      const mv=m=>{const r=st.getBoundingClientRect();q[i]={x:Math.max(0,Math.min(o.width,(m.clientX-r.left)/ds)),y:Math.max(0,Math.min(o.height,(m.clientY-r.top)/ds))};zeichne()};
+      const up=()=>{e.removeEventListener('pointermove',mv);e.removeEventListener('pointerup',up);e.removeEventListener('pointercancel',up)};
+      e.addEventListener('pointermove',mv);e.addEventListener('pointerup',up);e.addEventListener('pointercancel',up)})});
+    $('#zs-auto').onclick=()=>{const e=umrissErkennen(o);if(!e)return toast('Kein Umriss gefunden – Punkte bitte von Hand setzen');q=e;zeichne()};
+    $('#zs-voll').onclick=()=>{q=[{x:0,y:0},{x:o.width,y:0},{x:o.width,y:o.height},{x:0,y:o.height}];zeichne()};
+    const uebernehmen=()=>{const voll=q.every((p,i)=>Math.abs(p.x-[0,o.width,o.width,0][i])<2&&Math.abs(p.y-[0,0,o.height,o.height][i])<2);
+      t.ecken=voll?null:q;t.auto=false;t.bild=null};
+    $('#zs-vor')&&($('#zs-vor').onclick=()=>{uebernehmen();akt.ti=ti-1;render()});
+    $('#zs-nach')&&($('#zs-nach').onclick=()=>{uebernehmen();akt.ti=ti+1;render()});
+    $('#zs-del')&&($('#zs-del').onclick=()=>frage(`Teil ${ti+1} entfernen?`,'Entfernen',()=>{akt.teile.splice(ti,1);aktBild();ansicht='form';render();ocrLauf()}));
+    const fertig=()=>{uebernehmen();aktBild();ansicht='form';render();ocrLauf()};
+    $('#zs-ok').onclick=fertig;$('#g-back').onclick=()=>{ansicht='form';render()};
+    return;
+  }
   if(ansicht==='liste'){
-    const all=(await DB.all()).sort((a,b)=>b.zeit-a.zeit);
-    app.innerHTML=kopf('Meine Belege','die letzten 40')+`<main><div class="card">${all.length?all.map(x=>`<div class="li"><img src="${x.thumb}" alt=""><div class="m"><b>${h(x.meta.text)}</b><span>${fmtD(x.meta.datum)}${x.meta.kategorie?' · '+h(x.meta.kategorie):''}</span></div>
-      <div class="a">${h(x.meta.waehrung)} ${fmt(x.meta.betrag)}<small class="${x.status==='ok'?'st-ok':x.status==='fehler'?'st-err':'st-wait'}">${x.status==='ok'?'✓ in OneDrive':x.status==='fehler'?'Fehler – neuer Versuch folgt':'⏳ wartet'}</small></div></div>`).join(''):'<div class="note">Noch keine Belege erfasst.</div>'}</div>
-      ${all.some(x=>x.status!=='ok')?'<button class="btn pri big" id="l-up">Jetzt hochladen</button>':''}</main>`;
+    const all=await DB.all(),jetztM=today().slice(0,7);
+    if(!listMonat)listMonat=jetztM;
+    const [yy,mm]=listMonat.split('-').map(Number),mName=new Date(yy,mm-1,1).toLocaleDateString('de-CH',{month:'long',year:'numeric'});
+    const liste=all.filter(x=>(x.meta.datum||'').startsWith(listMonat)).sort((a,b)=>a.meta.datum.localeCompare(b.meta.datum)||a.zeit-b.zeit);
+    const tot={},mw={};liste.forEach(x=>{const c=x.meta.waehrung||'CHF';tot[c]=(tot[c]||0)+(+x.meta.betrag||0);mw[c]=(mw[c]||0)+(+x.meta.mwst||0)});
+    const verschiebe=n=>{const d=new Date(yy,mm-1+n,1);listMonat=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;render()};
+    const offen=all.filter(x=>x.status!=='ok').length;
+    app.innerHTML=kopf('Monatsliste','geprüfte Belege, nach Datum')+`<main>
+      <div class="mon"><button class="ib" id="m-vor" aria-label="Voriger Monat">‹</button><b>${h(mName)}</b><button class="ib" id="m-nach" aria-label="Nächster Monat" ${listMonat>=jetztM?'disabled style="opacity:.35"':''}>›</button></div>
+      <div class="card">${liste.length?liste.map((x,i)=>`<div class="li"><span class="nr">${i+1}</span>${x.thumb?`<img src="${x.thumb}" alt="">`:''}<div class="m"><b>${h(x.meta.text)}</b><span>${fmtD(x.meta.datum)}${x.meta.kategorie?' · '+h(x.meta.kategorie):''}${x.meta.mwst!==''&&x.meta.mwst!=null?' · MWST '+fmt(x.meta.mwst):''}</span></div>
+        <div class="a">${h(x.meta.waehrung)} ${fmt(x.meta.betrag)}<small class="${x.status==='ok'?'st-ok':x.status==='fehler'?'st-err':'st-wait'}">${x.status==='ok'?'✓ in OneDrive':x.status==='fehler'?'Fehler – neuer Versuch folgt':'⏳ wartet'}</small></div></div>`).join(''):`<div class="note">Keine Belege im ${h(mName)}.</div>`}
+        ${liste.length?`<div style="border-top:2px solid var(--line);margin-top:4px;padding-top:8px">${Object.keys(tot).map(c=>`<div class="tot">Total ${c} <span>${liste.filter(x=>(x.meta.waehrung||'CHF')===c).length} Belege · MWST ${fmt(mw[c])}</span>${fmt(tot[c])}</div>`).join('')}</div>`:''}</div>
+      ${offen?'<button class="btn pri big" id="l-up" style="margin-bottom:12px">Jetzt hochladen</button>':''}
+      <div class="note">Gedruckt wird am Monatsende in <b>re admin › Finanz Management › Kassabelege › Sammel-PDF</b>: dieselbe Liste chronologisch, danach jeder Beleg als Scan – lange Belege in Abschnitten nebeneinander, gut lesbar.</div></main>`;
     $('#g-back').onclick=()=>{ansicht='kamera';render()};
+    $('#m-vor').onclick=()=>verschiebe(-1);$('#m-nach').onclick=()=>{if(listMonat<jetztM)verschiebe(1)};
     $('#l-up')&&($('#l-up').onclick=()=>queueLauf(true));
     return;
   }
@@ -601,7 +807,7 @@ async function appUpdateCheck(manual){
     const apk=(rel.assets||[]).find(x=>x.name==='reRec.apk');
     // Der Update-Baustein (Capgo) verlangt die SHA-256-Prüfsumme des Pakets; sie steht in der Release-Beschreibung
     const sum=(String(rel.body||'').match(/sha256:\s*([a-f0-9]{64})/i)||[])[1];
-    if(rv>+appVer.version&&a){appUpd={version:rv,url:a.browser_download_url,checksum:sum?sum.toLowerCase():'',apk:apk?apk.browser_download_url:rel.html_url};if(ansicht!=='form')render()}
+    if(rv>+appVer.version&&a){appUpd={version:rv,url:a.browser_download_url,checksum:sum?sum.toLowerCase():'',apk:apk?apk.browser_download_url:rel.html_url};if(ansicht==='kamera'&&!anfuegen||ansicht==='einst')render()}
     else if(manual)toast('re rec ist aktuell (Version '+appVer.version+')')}
   catch(e){if(manual)toast('Update-Server nicht erreichbar')}
 }
@@ -625,6 +831,7 @@ function appApkFallback(grund){
 }
 if(CAP){const A=capPlugin('App');if(A&&A.addListener)A.addListener('backButton',()=>{
   if(document.querySelector('.dlg')){document.querySelector('.dlg').remove();return}
+  if(ansicht==='zuschnitt'||(ansicht==='kamera'&&anfuegen&&akt)){anfuegen=false;ansicht='form';render();return}
   if(ansicht!=='kamera'){akt=null;ansicht='kamera';render()}else if(A.exitApp)A.exitApp()})}
 (async()=>{await handleRedirect();render();queueLauf();if(CAP){appUpdateCheck(false);setInterval(()=>appUpdateCheck(false),6*3600e3)}})();
 </script>
