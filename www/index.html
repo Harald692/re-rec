@@ -598,15 +598,30 @@ async function appUpdateCheck(manual){
   if(!appVer||!appVer.repo)return;
   try{const rel=await (await fetch(`https://api.github.com/repos/${appVer.repo}/releases/latest`,{cache:'no-store'})).json();
     const rv=+String(rel.tag_name||'').replace(/^v/,'');const a=(rel.assets||[]).find(x=>x.name==='www.zip');
-    if(rv>+appVer.version&&a){appUpd={version:rv,url:a.browser_download_url};if(ansicht!=='form')render()}
+    const apk=(rel.assets||[]).find(x=>x.name==='reRec.apk');
+    // Der Update-Baustein (Capgo) verlangt die SHA-256-Prüfsumme des Pakets; sie steht in der Release-Beschreibung
+    const sum=(String(rel.body||'').match(/sha256:\s*([a-f0-9]{64})/i)||[])[1];
+    if(rv>+appVer.version&&a){appUpd={version:rv,url:a.browser_download_url,checksum:sum?sum.toLowerCase():'',apk:apk?apk.browser_download_url:rel.html_url};if(ansicht!=='form')render()}
     else if(manual)toast('re rec ist aktuell (Version '+appVer.version+')')}
   catch(e){if(manual)toast('Update-Server nicht erreichbar')}
 }
 async function appUpdateInstall(btn){
   const U=capPlugin('CapacitorUpdater');if(!U||!appUpd)return;
   btn.disabled=true;btn.textContent='Wird geladen …';
-  try{const b=await U.download({url:appUpd.url,version:String(appUpd.version)});btn.textContent='Wird installiert …';await U.set({id:b.id})}
-  catch(e){btn.disabled=false;btn.textContent='Erneut versuchen';toast('Update fehlgeschlagen')}
+  if(!appUpd.checksum){btn.disabled=false;appApkFallback('Für diese Version fehlt die Prüfsumme');return}
+  try{const b=await U.download({url:appUpd.url,version:String(appUpd.version),checksum:appUpd.checksum});btn.textContent='Wird installiert …';await U.set({id:b.id})}
+  catch(e){btn.disabled=false;btn.textContent='Erneut versuchen';appApkFallback((e&&e.message)||String(e))}
+}
+/* Notlösung: neue APK im Browser herunterladen und über die App installieren */
+function appApkFallback(grund){
+  toast('Update fehlgeschlagen: '+grund);
+  if(!appUpd||!appUpd.apk)return;
+  const d=document.createElement('div');d.className='dlg';
+  d.innerHTML=`<div class="box"><h3 style="margin:0 0 8px">Update von Hand installieren</h3>
+    <p style="margin:0 0 12px">Das automatische Update hat nicht geklappt (${h(grund)}). Du kannst die neue App direkt herunterladen und über die bisherige installieren – deine Einstellungen bleiben erhalten.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn pri" href="${h(appUpd.apk)}" target="_blank" rel="noopener">Neue App herunterladen</a><button class="btn" type="button">Schliessen</button></div></div>`;
+  d.querySelector('button').onclick=()=>d.remove();d.onclick=e=>{if(e.target===d)d.remove()};
+  document.body.appendChild(d);
 }
 if(CAP){const A=capPlugin('App');if(A&&A.addListener)A.addListener('backButton',()=>{
   if(document.querySelector('.dlg')){document.querySelector('.dlg').remove();return}
